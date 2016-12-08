@@ -1,0 +1,22 @@
+<div class="row">
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+        <th class="time">
+          Time
+        </th>
+        <%=@time_range.each do |time|%>
+        <%end%>
+      </tr>
+    </thead>
+    <tbody>
+      <%@day_range.each do |day|%>
+        <tr>
+          <td>
+           <%=day%>
+         </td>
+        </tr>
+      <%end%>
+    </tbody>
+  </table>
+</div>
