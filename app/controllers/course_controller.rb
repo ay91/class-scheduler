@@ -7,27 +7,28 @@ class CourseController < ApplicationController
     end
   end
 
-  def add_lesson
+  course = Course.find(params[:id])
+
+  def add_course
+    course = Course.find_by(id: params[:id])
     if !@selected_courses
-      course = Course.find(params[:id])
-      timeslot = []
-      course.slots.each {|slot| timeslot += [slot.day, slot.start_time, slot.end_time]}
-
-      @courses = timeslot
-
-
-   else
-      @courses = JSON.parse(@selected_courses)
-      mandatory_course
-      course = Course.find_by(id: params[:id])
-
-      if mandatory_course.include?(course)
-        # raise exception
+      @selected_courses << course
+    else
+      if @selected_courses.include?(course)
+        flash[:danger] = "#{course.name} has already been selected"
       else
-        @courses << params[:id]
+        @selected_courses.each do |selected_course|
+            @conflicts[selected_course.id] = find_conflicts(course, selected_course)? find_conflicts(course, selected_course) : nil
+        end
       end
-   end
-      cookies[:courses] = JSON.generate(@courses)
+
+      if @conflicts
+        flash[:danger] = "your selected course conflicts with #{@conflicts.key}"
+      else
+        @selected_courses << params[:id]
+      end
+    end
+      cookies[:course_ids] = JSON.generate(@courses)
   end
 
   def mandatory_course
@@ -37,9 +38,20 @@ class CourseController < ApplicationController
     mandatory_course << mandatory_course_1 << mandatory_course_2
   end
 
+  def find_conflicts(course1, course2)
+    conflicting_slots = []
+    if course1.slots.day == course2.slots.day
+      && ((course2.slots.start_time < course1.slots.start_time && course2.slots.end_time > course1.slots.end_time)
+      ||  (course2.slots.start_time > course1.slots.start_time && course2.slots.start_time < course1.slots.end_time)
+      ||  (course2.slots.end_time > course1.slots.start_time && course2.slots.end_time < course1.slots.end_time))
+      conflicting_slots << course1.slots << course2.slots
+    end
+  end
+
   private
 
   def selected_course
-    @selected_courses = cookies[:course]
+    selected_course_ids = JSON.parse(cookies[:course_ids])
+    @selected_courses = selected_course_ids.map {|id| Course.find_by(id: id)}
   end
 end
