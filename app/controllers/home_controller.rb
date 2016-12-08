@@ -1,9 +1,7 @@
 class HomeController < ApplicationController
   def index
-    # start_time = Time.new(2016,12,7,8,30,00)
-    # end_time = Time.new(2016,12,7,7,00,00)
-    start_time = 8.3
-    end_time = 17.0
-    @time_range = (start_time..end_time)
+    @day = %w(M T W TH F)
+    @timeslot = %w(0830 0900 0930 1000 1030 1100 1130 1200 1230 100 130 200 230 300 330 400 430 500 530 600 630 0700)
+
   end
 end

@@ -5,18 +5,23 @@
         <th class="time">
           Time
         </th>
-        <%=@time_range.each do |time|%>
+        <%@timeslot.each do |ts|%>
+          <th><%=ts%></th>
         <%end%>
       </tr>
     </thead>
     <tbody>
-      <%@day_range.each do |day|%>
+      <%@day.each do |day| %>
         <tr>
-          <td>
-           <%=day%>
-         </td>
+          <td><%=day%></td>
+          <%@timeslot.each do |timeslot| %>
+            <td></td>
+          <%end%>
         </tr>
       <%end%>
     </tbody>
   </table>
 </div>
+
+
+<%=link_to "Complete", "#", disabled: true, class: 'btn btn-success'%>

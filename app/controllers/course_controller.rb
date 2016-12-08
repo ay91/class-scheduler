@@ -1,14 +1,6 @@
 class CourseController < ApplicationController
   before_action :selected_courses
 
-  def show
-    if @selected_courses
-      courses = JSON.parse(@selected_courses)
-    end
-  end
-
-  course = Course.find(params[:id])
-
   def add_course
     course = Course.find_by(id: params[:id])
     if !@selected_courses
@@ -23,19 +15,33 @@ class CourseController < ApplicationController
       end
 
       if @conflicts
-        flash[:danger] = "your selected course conflicts with #{@conflicts.key}"
+        flash[:danger] = "your selected course conflicts with #{@conflicts.values[0].name}"
       else
         @selected_courses << params[:id]
       end
     end
       cookies[:course_ids] = JSON.generate(@courses)
+      can_complete
+  end
+
+  def can_complete
+    credit = 0
+    @selected_courses.each do |sc|
+      credit += sc.credit
+      credit
+    end
+
+    if @selected_courses.include?(@mandatory_course) && credit >= 15
+      # display the button
+      student.completed = true
+    end
   end
 
   def mandatory_course
-    mandatory_course = []
+    @mandatory_course = []
     mandatory_course_1 = Course.find_by(name: 'Bahasa Malaysia 200: Bahasa Jiwa Bangsa')
     mandatory_course_2 = Course.find_by(name: 'Computer Science 215: Software Engineering I')
-    mandatory_course << mandatory_course_1 << mandatory_course_2
+    @mandatory_course << mandatory_course_1 << mandatory_course_2
   end
 
   def find_conflicts(course1, course2)
